@@ -1,0 +1,29 @@
+PREFIX besluit: <http://data.vlaanderen.be/ns/besluit#>
+PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>
+PREFIX adms: <http://www.w3.org/ns/adms#>
+
+DELETE{
+    GRAPH ?g {
+          ?vergaderactiviteit adms:identifier ?vergaderActiviteitNummer .
+    }
+}
+INSERT {
+    GRAPH ?g {
+        ?vergaderactiviteit adms:identifier ?vrpvWithYearAndSlashAndvergaderActiviteitNummer .
+    }
+} WHERE{
+   GRAPH ?g {
+        SELECT ?g, ?vergaderactiviteit, ?vergaderActiviteitFullDate, ?vergaderActiviteitNummer, ?vergaderActiviteitYearOnly, ?vrpvWithYear, ?vrpvWithYearAndSlash, ?vrpvWithYearAndSlashAndvergaderActiviteitNummer
+WHERE {
+                ?vergaderactiviteit a besluit:Vergaderactiviteit .
+                ?vergaderactiviteit besluit:geplandeStart ?vergaderActiviteitFullDate .
+                ?vergaderactiviteit adms:identifier ?vergaderActiviteitNummer .
+
+                BIND ((CONCAT(SUBSTR(str(?vergaderActiviteitFullDate),1,4))) AS ?vergaderActiviteitYearOnly)
+                BIND (CONCAT("VR PV ", ?vergaderActiviteitYearOnly) as ?vrpvWithYear)
+                BIND (CONCAT(?vrpvWithYear, "/") as ?vrpvWithYearAndSlash)
+                BIND (CONCAT(?vrpvWithYearAndSlash, ?vergaderActiviteitNummer) as ?vrpvWithYearAndSlashAndvergaderActiviteitNummer)
+        }
+
+   }
+}
